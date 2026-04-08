@@ -83,6 +83,34 @@ python scripts/02_generate_probability_maps.py && python scripts/03_threshold_an
 
 All models evaluated on the same fixed 304-image test set with majority vote ground truth.
 
+## Learning Rate Search (Optuna)
+
+One model (`majority_yolo26l_best_lr`) was trained using **Optuna** Bayesian hyperparameter optimisation to find the optimal learning rate instead of relying on the Ultralytics default.
+
+**How it works:**
+1. Optuna defines a search space for the learning rate (e.g. log-uniform between `1e-5` and `1e-2`)
+2. It runs multiple training trials, each with a different learning rate sampled from the search space
+3. After each trial it evaluates validation Dice and uses that score to guide the next sample — favouring regions of the search space that showed improvement
+4. The best learning rate found is used to train the final model
+
+**Result:** `majority_yolo26l_best_lr` achieved Dice **0.7895**, slightly below the standard `majority_yolo26m` (Dice **0.7974**). This shows that for this dataset size and task, **model size and data quality matter more than the exact learning rate**. The medium model (26m) with default learning rate outperformed the large model (26l) with Optuna-tuned learning rate.
+
+Script: `scripts/01_train_yolo.py --dataset majority --size l` with Optuna integration in `12_optuna_lr_search.py`.
+
+## 5-Fold Cross Validation
+
+Evaluation only — no retraining. The full dataset was split into 5 folds (seed=42). Each model was evaluated on each held-out fold to measure stability across different data partitions.
+
+| Model | Type | CV Dice | CV Std | Notes |
+|---|---|---|---|---|
+| medsam_majority_aug | MedSAM | **0.9399** | **0.0012** | Triangle threshold |
+| medsam_gbarimah_aug | MedSAM | 0.9398 | 0.0013 | Triangle threshold |
+| majority_yolo26l_best_lr | YOLO | 0.8116 | 0.0089 | Optuna LR |
+| majority_yolo26l | YOLO | 0.8112 | 0.0106 | Standard training |
+| gbarimah_yolo26l | YOLO | 0.7667 | 0.0056 | Gbarimah masks |
+
+> **MedSAM is 7× more stable than YOLO** — CV std 0.0012 vs 0.0106. The frozen ViT-B encoder (pretrained on 1.5M medical images) prevents overfitting even on 2,127 training images. Only 4.3% of MedSAM parameters are trainable.
+
 ## Key Findings
 
 1. **Label quality > quantity** — majority vote on 3,040 images beats individual annotators on 15,000+ images

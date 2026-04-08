@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Data — never commit raw images or masks
+raw_data/
+three_way_intersection/images/
+three_way_intersection/yolo_datasets/
+three_way_intersection/majority_masks/
+balanced_dataset/
+
+# Model weights — too large for git
+*.pt
+*.pth
+*.onnx
+runs/
+
+# Probability maps — large binary files
+probability_maps/
+temperature_scaling_results/scaled_maps/
+
+# Results — commit only summary CSVs, not per-image files
+threshold_analysis_results/**/*_per_image.csv
+temperature_scaling_results/threshold_results/
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+wandb/

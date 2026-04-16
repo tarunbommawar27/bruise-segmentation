@@ -92,6 +92,8 @@ ITA_BINS = [
 # ── Skin tone balancing ───────────────────────────────────────────────────────
 MAX_IMAGE_PIXELS_ITA = 2_000_000   # resize images above this before ITA compute
 AUGMENTATION_SCALE   = (0.85, 1.15)
+N_TARGET             = 300         # Effect Size Targeting: min samples per bin
+REDUNDANCY_CAP       = 15          # max geometric variants per original image
 
 # ── MedSAM ────────────────────────────────────────────────────────────────────
 MEDSAM_IMGSZ      = 1024
